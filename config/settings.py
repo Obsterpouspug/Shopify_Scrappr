@@ -194,6 +194,7 @@ Insert second image after benefits:
 - Rewrite intelligently using product logic.
 - Keep only essential product value.
 
+Prioritize keywords likely searched on Google by French buyers
 Return ONLY valid JSON, no markdown, no explanation, no trailing text after the closing brace.
 
 JSON schema:
