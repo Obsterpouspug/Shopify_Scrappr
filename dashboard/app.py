@@ -111,7 +111,7 @@ with st.sidebar:
     st.markdown("**⚙️ Settings**")
     col1, col2 = st.columns(2)
     with col1: limit = st.number_input("Max products", min_value=10, max_value=5000, value=500, step=50)
-    with col2: model = st.selectbox("Model", ["gemini-2.0-flash-lite","gemini-2.0-flash","gemini-1.5-flash"])
+    with col2: model = st.selectbox("Model", ["gemini-flash-lite-latest"])
     bestsellers = st.checkbox("Best-sellers first", value=True)
     dry_run     = st.checkbox("Dry run (no import)", value=False)
     st.divider()
