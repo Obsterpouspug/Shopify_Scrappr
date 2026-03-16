@@ -85,7 +85,9 @@ class PipelineConfig:
 
 
 # Rewrite prompt template (used by Gemini rewriter)
-REWRITE_PROMPT = """You are an expert e-commerce copywriter specializing in product listings for French-speaking markets. Your job is to create compelling, SEO-optimized product content structured for a rich product page.
+REWRITE_PROMPT = """You are an expert French ecommerce product copywriter specialized in rewriting competitor product pages for Google Shopping stores.
+
+Your job is to rewrite competitor product content into clean, natural French with zero grammar mistakes.
 
 Original product data:
 - Title: {title}
@@ -93,46 +95,104 @@ Original product data:
 - Tags: {tags}
 - Price: {price}
 
-OUTPUT STRUCTURE — Follow this exact format, in French:
+STRICT RULES:
 
-**Title:** [Product title — max 100 characters, SEO-optimized, descriptive]
+1. OUTPUT LANGUAGE
+- Always write 100% in French.
+- Natural native French only.
+- No spelling mistakes.
+- No awkward literal translation.
 
-**Headline:** [One sentence hook — benefit-driven, 10–15 words]
+2. TITLE OPTIMIZATION (VERY IMPORTANT)
+- Generate a clean Google Shopping optimized title.
+- Remove all competitor brand names, store names, trademarks, or proprietary names.
+- Keep only high-intent product keywords.
+- Title must be concise, readable, SEO friendly.
+- No keyword stuffing.
+- No exaggerated marketing words.
 
-**Description:**
-[5 paragraphs of body copy. Each paragraph: 3–5 sentences. Rules:
-  - Paragraph 1: Introduce the product with its primary use case and key benefit
-  - Paragraph 2: Explain how it works / the core mechanism or pedagogy
-  - Paragraph 3 (optional image alt-text slug in the middle): Insert one SEO image filename slug on its own line, format: word-word-word-word. Then continue with emotional/brand angle
-  - Paragraph 4: Materials, safety, physical details, age range
-  - Paragraph 5 (with section header in ALL CAPS above it): Bold section title like "APPRENDRE PAR LA MANIPULATION", then insert one more image slug on a new line, then list the 7 key benefits using the format: "- Benefit statement" (no bullet symbols, plain dashes)
-]
+3. DESCRIPTION STYLE
+- Description must be short.
+- Keep only essential selling points.
+- Avoid redundancy.
+- Rewrite completely, never copy competitor wording.
+- Remove competitor brand/store mentions everywhere.
 
-**Section: UNE QUALITÉ ADAPTÉE AUX ENFANTS**
-[Insert one image slug on its own line]
-Caractéristiques du produit:
-- Type : ...
-- Fonction : ...
-- Matériaux : ...
-- Poids : ...
-- Dimensions : ...
-- Inclus : ...
-- Âge recommandé : ...
-- Utilisation : ...
-[Insert one image slug on its own line]
+4. DESCRIPTION STRUCTURE (MANDATORY)
 
-**Closing paragraph:**
-[2–3 sentences. Restate the product name, summarize the transformation/value it provides, and end on an emotional benefit for the child or parent.]
+Output exactly in this structure:
 
-WRITING RULES:
-- Write entirely in French
-- Tone: warm, educational, parental — never salesy or promotional
-- Avoid ALL CAPS in body text (section headers excepted)
-- No markdown formatting in the final output (no **, no #)
-- No invented specifications — if unknown, omit
-- Image slugs: lowercase, hyphen-separated, descriptive of the product visually (e.g. jeu-magnétique-montessori-avec-chiffres-colorés)
-- Weave the product name naturally into the text at least 3 times
-- SEO keywords should feel organic, not stuffed
+//Title  
+[Optimized title]
+
+//Headline + Description  
+[Short product headline]  
+[Short first paragraph: 2–4 lines maximum]
+
+[INSERT_FIRST_IMAGE_OR_GIF]
+
+[Second short paragraph]
+
+
+
+//Avantages  
+- [Benefit 1]  
+- [Benefit 2]  
+- [Benefit 3]  
+- [Benefit 4]  
+- [Benefit 5]  
+- [Benefit 6 max]
+
+[INSERT_SECOND_IMAGE_OR_GIF]
+
+
+
+//Spécifications du produit  
+- Type :
+- Matériau :
+- Dimensions :
+- Âge:
+
+
+
+//Petite conclusion  
+[Very short conclusion: 2 lines max]
+
+5. IMAGE / GIF INSERTION
+- If competitor description contains image or gif:
+Insert first image after first short paragraph:
+[INSERT_FIRST_IMAGE_OR_GIF]
+
+Insert second image after benefits:
+[INSERT_SECOND_IMAGE_OR_GIF]
+
+6. BENEFITS RULES
+- Bullet points only.
+- Short bullets.
+- No repetition.
+- Benefits must be practical and concrete.
+
+7. DESCRIPTION LENGTH
+- Keep description compact.
+- Never long blocks.
+- Easy to scan.
+
+8. FORBIDDEN
+- No competitor brand names
+- No competitor store names
+- No exaggerated claims
+- No fake medical claims
+- No unnecessary adjectives
+
+9. STYLE
+- Clean
+- Professional
+- Conversion oriented
+- Suitable for ecommerce product page + Google Shopping traffic
+
+10. IF COMPETITOR CONTENT IS BAD
+- Rewrite intelligently using product logic.
+- Keep only essential product value.
 
 Return ONLY valid JSON, no markdown, no explanation, no trailing text after the closing brace.
 
