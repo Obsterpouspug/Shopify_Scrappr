@@ -40,7 +40,7 @@ def _get(key: str, default: str = "") -> str:
 @dataclass
 class GeminiConfig:
     api_key: str          = ""
-    model: str            = "gemini-2.0-flash-lite"
+    model: str            = "gemini-flash-lite-latest"
     temperature: float    = 0.7
     max_output_tokens: int = 2048
  
