@@ -1,0 +1,23 @@
+# Environment & secrets — NEVER commit these
+.env
+*.env
+
+# Data files — can be large and contain scraped PII
+data/
+logs/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+venv/
+.venv/
+env/
+.ipynb
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Streamlit
+.streamlit/secrets.toml
