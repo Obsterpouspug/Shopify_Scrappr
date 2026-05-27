@@ -64,6 +64,7 @@ footer { display: none !important; }
 section[data-testid="stSidebar"] {
   background: var(--surface) !important;
   border-right: 1px solid var(--border) !important;
+  min-width: 260px !important;
 }
 section[data-testid="stSidebar"] .block-container {
   padding: 1.5rem 1.2rem 2rem !important;
@@ -73,6 +74,13 @@ section[data-testid="stSidebar"] label {
   font-size: 0.75rem !important;
   font-weight: 500 !important;
 }
+/* Keep collapse/expand chevron always visible so sidebar can be reopened */
+[data-testid="collapsedControl"] {
+  display: flex !important;
+  background: var(--surface) !important;
+  border-right: 1px solid var(--border) !important;
+}
+button[kind="header"] { display: flex !important; }
 
 /* ── Inputs ──────────────────────────────────────────── */
 .stTextInput input,
@@ -326,18 +334,43 @@ with st.sidebar:
     </div>
     """, unsafe_allow_html=True)
 
-    st.markdown(_sidebar_label("TARGET DOMAIN"), unsafe_allow_html=True)
-    competitor_domain = st.text_input(
-        "domain", placeholder="allbirds.com",
-        label_visibility="collapsed", key="domain_input"
+    st.markdown(_sidebar_label("SCRAPE MODE"), unsafe_allow_html=True)
+    scrape_mode = st.radio(
+        "mode", ["🏪 Full Shop", "🔗 Single URL", "📋 URL List"],
+        label_visibility="collapsed", key="scrape_mode",
     )
 
+    competitor_domain = ""
+    product_urls_raw  = ""
+
+    if scrape_mode == "🏪 Full Shop":
+        st.markdown(_sidebar_label("DOMAIN"), unsafe_allow_html=True)
+        competitor_domain = st.text_input(
+            "domain", placeholder="allbirds.com",
+            label_visibility="collapsed", key="domain_input",
+        )
+    elif scrape_mode == "🔗 Single URL":
+        st.markdown(_sidebar_label("PRODUCT URL"), unsafe_allow_html=True)
+        product_urls_raw = st.text_input(
+            "url", placeholder="https://store.com/products/slug",
+            label_visibility="collapsed", key="single_url_input",
+        )
+    else:
+        st.markdown(_sidebar_label("URLs (one per line)"), unsafe_allow_html=True)
+        product_urls_raw = st.text_area(
+            "urls", placeholder="https://store.com/products/slug-1\nhttps://store.com/products/slug-2",
+            label_visibility="collapsed", key="multi_url_input", height=120,
+        )
+
     st.markdown(_sidebar_label("CONFIGURATION"), unsafe_allow_html=True)
+    _url_mode = scrape_mode in ("🔗 Single URL", "📋 URL List")
     col_a, col_b = st.columns(2)
     with col_a:
         limit = st.number_input(
             "Max products", min_value=1, max_value=5000,
-            value=1, step=1, help="Maximum products to process"
+            value=1, step=1,
+            help="Set by URL list" if _url_mode else "Maximum products to process",
+            disabled=_url_mode,
         )
     with col_b:
         model = st.selectbox(
@@ -363,16 +396,17 @@ with st.sidebar:
 
     st.markdown("<br>", unsafe_allow_html=True)
 
-    can_run = bool(competitor_domain) and not st.session_state.running
+    _has_target = bool(competitor_domain or product_urls_raw.strip())
+    can_run = _has_target and not st.session_state.running
     run_clicked = st.button(
         "▶  Run Pipeline" if not st.session_state.running else "⏳  Running…",
         disabled=not can_run,
         key="run_btn",
     )
-    if not competitor_domain:
+    if not _has_target:
         st.markdown(
             '<div style="text-align:center;font-size:0.72rem;color:#f59e0b;margin-top:0.4rem">'
-            '↑ Enter a domain to start'
+            '↑ Enter a target to start'
             '</div>',
             unsafe_allow_html=True,
         )
@@ -381,7 +415,9 @@ with st.sidebar:
 # ══════════════════════════════════════════════════════════════
 # PIPELINE LAUNCH
 # ══════════════════════════════════════════════════════════════
-if run_clicked and competitor_domain and not st.session_state.running:
+product_urls = [u.strip() for u in product_urls_raw.splitlines() if u.strip()] if product_urls_raw else []
+
+if run_clicked and _has_target and not st.session_state.running:
     if gemini_key:    os.environ["GEMINI_API_KEY"]       = gemini_key
     if shopify_shop:  os.environ["SHOPIFY_SHOP_NAME"]    = shopify_shop
     if shopify_token: os.environ["SHOPIFY_ACCESS_TOKEN"] = shopify_token
@@ -415,7 +451,8 @@ if run_clicked and competitor_domain and not st.session_state.running:
 
     def _run_pipeline():
         try:
-            enqueue(f"▶ Pipeline starting | domain: {competitor_domain} | stages: {' → '.join(s.upper() for s in stages)} | dry_run: {dry_run}")
+            target_label = f"{len(product_urls)} URL(s)" if product_urls else competitor_domain
+            enqueue(f"▶ Pipeline starting | target: {target_label} | stages: {' → '.join(s.upper() for s in stages)} | dry_run: {dry_run}")
 
             def _progress_cb(stage, current, total, *_):
                 _BG_STATE["progress"] = {"stage": stage, "current": current, "total": total}
@@ -423,6 +460,7 @@ if run_clicked and competitor_domain and not st.session_state.running:
             report = pipeline.run(
                 competitor_domain=competitor_domain,
                 bestsellers_only=bestsellers,
+                product_urls=product_urls if product_urls else None,
                 stages=stages,
                 progress_callback=_progress_cb,
             )

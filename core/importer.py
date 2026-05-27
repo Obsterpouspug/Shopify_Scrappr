@@ -49,9 +49,9 @@ class ShopifyImporter:
     def build_product(self, product: dict) -> shopify.Product:
         """Convert scraped+rewritten dict to a shopify.Product object."""
         p = shopify.Product()
-        p.title      = str(product.get("rewritten_title") or product.get("title", ""))
-        p.body_html  = str(product.get("rewritten_description") or product.get("body_html", ""))
-        p.vendor     = str(product.get("vendor", "") or "")
+        p.title        = str(product.get("rewritten_title") or product.get("title", ""))
+        p.body_html    = str(product.get("rewritten_description") or product.get("body_html", ""))
+        p.vendor       = "Montessori France"
         p.product_type = str(product.get("product_type", "") or "")
         p.status     = "draft"
 
@@ -120,6 +120,7 @@ class ShopifyImporter:
             success = p.save()
 
             if success and p.id:
+                self._match_variant_images(p, product)
                 self.imported += 1
                 return {"id": p.id, "title": p.title, "status": p.status}
             else:
@@ -144,6 +145,40 @@ class ShopifyImporter:
             logger.error(f"Import exception — title: {title!r}", exc_info=True)
             self.failed += 1
             return None
+
+    def _match_variant_images(self, saved_product: shopify.Product, source: dict):
+        """
+        After a product is saved, map old image src URLs → new Shopify image IDs,
+        then update any variant that had an image_id in the source data.
+        """
+        try:
+            src_to_new_id = {
+                img.src: img.id
+                for img in (saved_product.images or [])
+                if getattr(img, "src", None) and getattr(img, "id", None)
+            }
+            if not src_to_new_id:
+                return
+
+            old_images = {img["id"]: img["src"] for img in source.get("images", []) if img.get("id") and img.get("src")}
+
+            updated = False
+            for old_v, new_v in zip(source.get("variants", []), saved_product.variants or []):
+                old_img_id = old_v.get("image_id")
+                if not old_img_id:
+                    continue
+                old_src = old_images.get(old_img_id)
+                if not old_src:
+                    continue
+                new_img_id = src_to_new_id.get(old_src)
+                if new_img_id:
+                    new_v.image_id = new_img_id
+                    updated = True
+
+            if updated:
+                saved_product.save()
+        except Exception as e:
+            logger.warning(f"Variant image matching failed (non-fatal): {e}")
 
     def import_batch(
         self,

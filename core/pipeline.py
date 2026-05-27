@@ -44,22 +44,28 @@ class DropshipPipeline:
 
     def stage_scrape(
         self,
-        domain: str,
+        domain: str = "",
         bestsellers_only: bool = True,
+        product_urls: list[str] = None,
         progress_callback=None,
     ) -> list[dict]:
-        P.stage_start("scrape", f"target: {domain}  |  limit: {self.pcfg.max_products}")
         scraper = ShopifyScraper(self.scrapcfg)
         try:
-            if bestsellers_only:
+            if product_urls:
+                P.stage_start("scrape", f"{len(product_urls)} URL(s)")
+                products = scraper.scrape_product_urls(product_urls)
+            elif bestsellers_only:
+                P.stage_start("scrape", f"target: {domain}  |  limit: {self.pcfg.max_products}")
                 P.info("Fetching best-sellers order…")
                 products = scraper.scrape_bestsellers(domain, limit=self.pcfg.max_products)
             else:
+                P.stage_start("scrape", f"target: {domain}  |  limit: {self.pcfg.max_products}")
                 P.info("Fetching all products (paginated)…")
                 products = scraper.scrape_all_products(domain, max_products=self.pcfg.max_products)
 
             if self.pcfg.save_raw:
-                path = scraper.save_raw(products, domain, self.pcfg.data_dir)
+                label = "urls" if product_urls else domain
+                path = scraper.save_raw(products, label, self.pcfg.data_dir)
                 P.info(f"Raw products saved → {path}")
 
             P.stage_done("scrape", f"{len(products)} products fetched")
@@ -128,20 +134,22 @@ class DropshipPipeline:
 
     def run(
         self,
-        competitor_domain: str,
+        competitor_domain: str = "",
         bestsellers_only: bool = True,
+        product_urls: list[str] = None,
         stages: list[str] = None,
         progress_callback=None,
     ) -> dict:
         stages = stages or ["scrape", "rewrite", "import"]
         start_time = time.time()
 
+        label = f"{len(product_urls)} URLs" if product_urls else competitor_domain
         P.set_log_fn(self.log_fn)
-        P.section(f"DROPSHIP PIPELINE  —  {competitor_domain}")
+        P.section(f"DROPSHIP PIPELINE  —  {label}")
         P.info(f"Stages: {' → '.join(s.upper() for s in stages)}")
         P.info(f"Limit: {self.pcfg.max_products}  |  Dry run: {self.pcfg.dry_run}")
 
-        report = {"domain": competitor_domain, "stages": {}}
+        report = {"domain": label, "stages": {}}
         products = []
         rewritten = []
 
@@ -150,6 +158,7 @@ class DropshipPipeline:
             products = self.stage_scrape(
                 competitor_domain,
                 bestsellers_only=bestsellers_only,
+                product_urls=product_urls,
                 progress_callback=progress_callback,
             )
             report["stages"]["scrape"] = {"count": len(products)}

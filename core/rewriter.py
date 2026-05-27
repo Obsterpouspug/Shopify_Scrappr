@@ -91,21 +91,45 @@ class ProductRewriter:
     # ── Single product ───────────────────────────────────────
 
     def rewrite_product(self, product: dict) -> Optional[dict]:
-        title       = product.get("title", "")
-        description = _strip_html(product.get("body_html", ""))[:800]
-        tags        = product.get("tags", "")
-        price       = ""
+        title    = product.get("title", "")
+        body_html = product.get("body_html", "")
+        tags     = product.get("tags", "")
+        price    = ""
         if product.get("variants"):
             price = product["variants"][0].get("price", "")
 
+        gif_urls, image_urls = _extract_media(body_html)
+        has_gif   = bool(gif_urls)
+        has_image = bool(image_urls)
+        description = _strip_html(body_html)[:800]
+
         prompt = REWRITE_PROMPT.format(
             title=title, description=description, tags=tags, price=price,
+            has_gif=str(has_gif).lower(), has_image=str(has_image).lower(),
         )
 
         raw = self._call_gemini(prompt)
         if not raw:
             return None
         result = self._parse_json(raw, title)
+
+        # Swap placeholders with real <img> tags
+        if result and result.get("description"):
+            desc = result["description"]
+            if has_gif and gif_urls:
+                desc = desc.replace(
+                    "[INSERT_GIF_1]",
+                    f'<img src="{gif_urls[0]}" alt="{title}" style="max-width:100%;border-radius:8px;margin:1rem 0">'
+                )
+            if has_image and image_urls:
+                desc = desc.replace(
+                    "[INSERT_IMAGE_1]",
+                    f'<img src="{image_urls[0]}" alt="{title}" style="max-width:100%;border-radius:8px;margin:1rem 0">'
+            )
+            # Clean up any remaining unfilled placeholders
+            import re as _re
+            desc = _re.sub(r'\[INSERT_(?:GIF|IMAGE)_\d+\]', '', desc)
+            result["description"] = desc
         if result and not self._same_product(title, result.get("title", "")):
             logger.warning(
                 f"Hallucination detected — original: '{title[:60]}' → got: '{result.get('title','')[:60]}'. Retrying."
@@ -272,3 +296,18 @@ class ProductRewriter:
 def _strip_html(html: str) -> str:
     import re
     return re.sub(r"<[^>]+>", " ", html).strip()
+
+
+def _extract_media(html: str) -> tuple[list[str], list[str]]:
+    """
+    Extract GIF URLs and static image URLs from competitor body_html.
+    Returns (gif_urls, image_urls) — GIFs take priority.
+    """
+    import re
+    gif_urls, image_urls = [], []
+    for src in re.findall(r'<img[^>]+src=["\']([^"\']+)["\']', html, re.IGNORECASE):
+        if src.lower().endswith('.gif') or 'gif' in src.lower():
+            gif_urls.append(src)
+        else:
+            image_urls.append(src)
+    return gif_urls, image_urls

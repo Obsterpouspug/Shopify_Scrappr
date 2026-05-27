@@ -94,6 +94,34 @@ class ShopifyScraper:
         logger.info(f"Got {len(products)} best-selling products.")
         return products
 
+    def scrape_product_url(self, url: str) -> Optional[dict]:
+        """Fetch a single product from its public Shopify URL via the .json endpoint."""
+        url = url.rstrip("/").split("?")[0]
+        json_url = url if url.endswith(".json") else f"{url}.json"
+        logger.info(f"Fetching single product: {json_url}")
+        data = self._get(json_url)
+        if data and "product" in data:
+            return data["product"]
+        logger.warning(f"No product data at {json_url}")
+        return None
+
+    def scrape_product_urls(self, urls: list[str]) -> list[dict]:
+        """Fetch multiple products by their individual URLs."""
+        products = []
+        for url in urls:
+            url = url.strip()
+            if not url:
+                continue
+            product = self.scrape_product_url(url)
+            if product:
+                products.append(product)
+                logger.info(f"  → Got: {product.get('title', '?')[:60]}")
+            else:
+                logger.warning(f"  → Skipped (no data): {url}")
+            time.sleep(1.0 / self.cfg.requests_per_second)
+        logger.info(f"Fetched {len(products)}/{len(urls)} products from URL list")
+        return products
+
     def save_raw(self, products: list[dict], domain: str, output_dir: str = "data") -> str:
         """Save raw scraped products to JSON for later reprocessing."""
         Path(output_dir).mkdir(parents=True, exist_ok=True)

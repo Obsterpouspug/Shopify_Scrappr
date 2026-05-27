@@ -118,56 +118,59 @@ Tags        : {tags}
 ━━━ SEO DESCRIPTION (for meta, max 160 characters) ━
 - One benefit-led sentence. Natural French. End with a soft CTA.
 
+━━━ MEDIA AVAILABLE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+GIF found in competitor description : {has_gif}
+Image found in competitor description : {has_image}
+- If {has_gif} is true  → include [INSERT_GIF_1]   after the first intro paragraph (priority placement).
+- If {has_image} is true → include [INSERT_IMAGE_1] after the benefits list.
+- If false → omit that placeholder entirely. Never write a placeholder for missing media.
+
 ━━━ PRODUCT DESCRIPTION STRUCTURE ━━━━━━━━━━━━━━━━━━
 Follow this exact HTML structure. Do not add or remove sections.
 
 <!-- SECTION 1: HEADLINE -->
-<h2>[Bold, punchy headline — 1 line, benefit-driven, not a slogan. Example: "Éclairez votre espace avec une ambiance RGB personnalisable à l'infini"]</h2>
+<h2>🌱 [Bold, punchy headline — 1 line, benefit-driven, not a slogan. The 🌱 emoji is mandatory and always first. Example: "🌱 Éveillez la curiosité de votre enfant avec des instruments de musique en bois naturel"]</h2>
 
 <!-- SECTION 2: INTRO -->
 <p>[2–3 sentences. Introduce the product, what it does, who it's for. Factual and warm. No hype.]</p>
 
-[INSERT_GIF_1]
+[INSERT_GIF_1 if applicable]
 
 <p>[1–2 sentences. A second angle: a key feature or use case not covered above.]</p>
 
 <!-- SECTION 3: BENEFITS -->
 <h3>✅ Pourquoi vous allez l'adorer</h3>
 <ul>
-  <li>🔹 [Benefit 1 — specific, concrete]</li>
-  <li>🔹 [Benefit 2]</li>
-  <li>🔹 [Benefit 3]</li>
-  <li>🔹 [Benefit 4]</li>
-  <li>🔹 [Benefit 5]</li>
-  <li>🔹 [Benefit 6 — max]</li>
+  <li>[emoji relevant to this specific benefit] [Benefit 1 — specific, concrete. No period before the emoji. Example: 🎵 Développe l'oreille musicale dès le plus jeune âge]</li>
+  <li>[emoji] [Benefit 2]</li>
+  <li>[emoji] [Benefit 3]</li>
+  <li>[emoji] [Benefit 4]</li>
+  <li>[emoji] [Benefit 5]</li>
+  <li>[emoji] [Benefit 6 — max]</li>
 </ul>
 
-[INSERT_IMAGE_1]
+[INSERT_IMAGE_1 if applicable]
 
-<!-- SECTION 4: SPECS -->
+<!-- SECTION 4: SPECS — include ONLY fields you can confirm from the input, skip the rest -->
 <h3>📦 Caractéristiques</h3>
 <ul>
   <li><strong>Marque :</strong> Montessori France</li>
-  <li><strong>Type :</strong> [product type]</li>
-  <li><strong>Matériau :</strong> [material — omit if unknown]</li>
-  <li><strong>Dimensions :</strong> [dimensions — omit if unknown]</li>
-  <li><strong>Couleur :</strong> [color — omit if unknown]</li>
-  <li><strong>Contenu :</strong> [what's in the box — omit if unknown]</li>
-  <li><strong>Âge recommandé :</strong> [age — omit if not relevant]</li>
+  [Include only the lines below that you have real data for — omit the others entirely]
+  <li><strong>Matériaux :</strong> [confirmed material only]</li>
+  <li><strong>Tranche d'âge :</strong> [confirmed age range only]</li>
+  <li><strong>Dimensions :</strong> [confirmed dimensions only]</li>
+  <li><strong>Contenu du colis :</strong> [confirmed box contents only]</li>
 </ul>
 
 <!-- SECTION 5: CTA -->
 <p>🎁 [1–2 sentences. Restate the product name, summarize its core value. Warm, natural CTA — not pushy.]</p>
 
 ━━━ EMOJI RULES ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-- Use emojis only at the start of headings and bullet points. Max 1 emoji per line.
-- Never use emojis mid-sentence.
-- Allowed: ✅ 🔹 📦 🎁 and one thematic emoji relevant to the product in the CTA.
-
-━━━ IMAGE / GIF PLACEHOLDERS ━━━━━━━━━━━━━━━━━━━━━━━
-- If competitor description contains a GIF: place [INSERT_GIF_1] after the intro paragraph.
-- If competitor description contains images: place [INSERT_IMAGE_1] after the benefits list.
-- If no media found in the input: omit both placeholder lines entirely.
+- 🌱 is mandatory on the h2 headline. Always.
+- Each benefit <li> must start with a unique emoji relevant to that specific benefit. No 🔹.
+- No period or dot before any emoji.
+- Max 1 emoji per line. No emojis mid-sentence.
+- Allowed in CTA: 🎁 plus one thematic emoji at the end.
 
 ━━━ OUTPUT FORMAT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Return valid JSON only. No markdown fences. No text outside the JSON.
