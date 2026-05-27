@@ -73,19 +73,16 @@ section[data-testid="stSidebar"] label {
   font-size: 0.75rem !important;
   font-weight: 500 !important;
 }
-/* Collapsed sidebar re-open strip — high contrast so it's never invisible */
+/* Hide sidebar collapse button — all known Streamlit selectors */
+section[data-testid="stSidebar"] > div > button,
+section[data-testid="stSidebar"] > div > div > button,
+button[data-testid="baseButton-header"],
+button[aria-label="Close sidebar"],
+button[aria-label="Collapse sidebar"],
 [data-testid="collapsedControl"] {
-  background: #1e293b !important;
-  border-right: 2px solid #3b82f6 !important;
-  min-width: 24px !important;
-}
-[data-testid="collapsedControl"] button {
-  color: #3b82f6 !important;
-  font-size: 1.1rem !important;
-}
-[data-testid="collapsedControl"] button:hover {
-  background: rgba(59,130,246,0.2) !important;
-  color: #fff !important;
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
 }
 
 /* ── Inputs ──────────────────────────────────────────── */
@@ -199,6 +196,36 @@ hr { border-color: var(--border) !important; margin: 0.75rem 0 !important; }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
 </style>
+<script>
+(function(){
+  function killCollapseBtn(){
+    var targets = [
+      '[data-testid="collapsedControl"]',
+      'button[data-testid="baseButton-header"]',
+      'button[aria-label="Close sidebar"]',
+      'button[aria-label="Collapse sidebar"]'
+    ];
+    targets.forEach(function(sel){
+      document.querySelectorAll(sel).forEach(function(el){
+        el.style.setProperty('display','none','important');
+        el.style.setProperty('pointer-events','none','important');
+      });
+    });
+    /* Also hide first-child direct buttons of sidebar */
+    var sb = document.querySelector('section[data-testid="stSidebar"]');
+    if(sb){
+      var d = sb.firstElementChild;
+      if(d){
+        Array.from(d.querySelectorAll(':scope > button, :scope > div > button')).forEach(function(b){
+          b.style.setProperty('display','none','important');
+        });
+      }
+    }
+  }
+  setInterval(killCollapseBtn, 300);
+  new MutationObserver(killCollapseBtn).observe(document.body,{childList:true,subtree:true});
+})();
+</script>
 """, unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════
