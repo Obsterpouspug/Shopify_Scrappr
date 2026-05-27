@@ -73,15 +73,8 @@ section[data-testid="stSidebar"] label {
   font-size: 0.75rem !important;
   font-weight: 500 !important;
 }
-/* Hide only the collapse arrow inside the expanded sidebar */
-section[data-testid="stSidebar"] button[data-testid="baseButton-header"] { display: none !important; }
-/* Keep the re-open strip visible and themed in case sidebar is collapsed */
-[data-testid="collapsedControl"] {
-  display: flex !important;
-  visibility: visible !important;
-  background: var(--surface) !important;
-  border-right: 1px solid var(--border) !important;
-}
+/* Hide the collapse chevron button inside the sidebar */
+section[data-testid="stSidebar"] [data-testid="collapsedControl"] { display: none !important; }
 
 /* ── Inputs ──────────────────────────────────────────── */
 .stTextInput input,
@@ -194,6 +187,15 @@ hr { border-color: var(--border) !important; margin: 0.75rem 0 !important; }
 ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
 </style>
+<script>
+(function() {
+    function expandSidebar() {
+        var btn = document.querySelector('[data-testid="collapsedControl"] button');
+        if (btn) { btn.click(); }
+    }
+    [100, 300, 700, 1500].forEach(function(ms) { setTimeout(expandSidebar, ms); });
+})();
+</script>
 """, unsafe_allow_html=True)
 
 # ══════════════════════════════════════════════════════════════
