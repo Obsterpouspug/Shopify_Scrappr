@@ -73,23 +73,10 @@ section[data-testid="stSidebar"] label {
   font-size: 0.75rem !important;
   font-weight: 500 !important;
 }
-/* Collapsed sidebar toggle — always visible and themed */
-[data-testid="collapsedControl"] {
-  display: flex !important;
-  visibility: visible !important;
-  opacity: 1 !important;
-  background: var(--surface) !important;
-  border-right: 1px solid var(--border) !important;
-  z-index: 999 !important;
-}
-[data-testid="collapsedControl"] button {
-  color: var(--muted2) !important;
-  background: transparent !important;
-}
-[data-testid="collapsedControl"] button:hover {
-  color: var(--text) !important;
-  background: rgba(255,255,255,0.05) !important;
-}
+/* Sidebar is always open — hide collapse button and collapsed state trigger */
+[data-testid="collapsedControl"] { display: none !important; }
+section[data-testid="stSidebar"] button[data-testid="baseButton-header"] { display: none !important; }
+section[data-testid="stSidebar"] > div:first-child > button { display: none !important; }
 
 /* ── Inputs ──────────────────────────────────────────── */
 .stTextInput input,
