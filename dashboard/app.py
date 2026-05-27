@@ -73,6 +73,18 @@ section[data-testid="stSidebar"] label {
   font-size: 0.75rem !important;
   font-weight: 500 !important;
 }
+/* Collapsed sidebar re-open strip — make it visible on dark bg */
+[data-testid="collapsedControl"] {
+  background: var(--surface) !important;
+  border-right: 1px solid var(--border) !important;
+}
+[data-testid="collapsedControl"] button {
+  color: var(--blue) !important;
+}
+[data-testid="collapsedControl"] button:hover {
+  background: rgba(59,130,246,0.15) !important;
+  color: #fff !important;
+}
 
 /* ── Inputs ──────────────────────────────────────────── */
 .stTextInput input,
