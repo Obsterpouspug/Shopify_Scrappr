@@ -73,10 +73,15 @@ section[data-testid="stSidebar"] label {
   font-size: 0.75rem !important;
   font-weight: 500 !important;
 }
-/* Sidebar is always open — hide collapse button and collapsed state trigger */
-[data-testid="collapsedControl"] { display: none !important; }
+/* Hide only the collapse arrow inside the expanded sidebar */
 section[data-testid="stSidebar"] button[data-testid="baseButton-header"] { display: none !important; }
-section[data-testid="stSidebar"] > div:first-child > button { display: none !important; }
+/* Keep the re-open strip visible and themed in case sidebar is collapsed */
+[data-testid="collapsedControl"] {
+  display: flex !important;
+  visibility: visible !important;
+  background: var(--surface) !important;
+  border-right: 1px solid var(--border) !important;
+}
 
 /* ── Inputs ──────────────────────────────────────────── */
 .stTextInput input,
