@@ -4,6 +4,7 @@
 # ============================================================
 
 import streamlit as st
+import streamlit.components.v1 as components
 import json
 import os
 import sys
@@ -64,6 +65,11 @@ footer { display: none !important; }
 section[data-testid="stSidebar"] {
   background: var(--surface) !important;
   border-right: 1px solid var(--border) !important;
+  /* Prevent Streamlit's slide-off-screen collapse animation */
+  transform: none !important;
+  left: 0 !important;
+  min-width: 18rem !important;
+  visibility: visible !important;
 }
 section[data-testid="stSidebar"] .block-container {
   padding: 1.5rem 1.2rem 2rem !important;
@@ -73,15 +79,14 @@ section[data-testid="stSidebar"] label {
   font-size: 0.75rem !important;
   font-weight: 500 !important;
 }
-/* Hide sidebar collapse button only — NOT collapsedControl (that's the reopen strip) */
-section[data-testid="stSidebar"] > div > button,
-section[data-testid="stSidebar"] > div > div > button,
-button[data-testid="baseButton-header"],
-button[aria-label="Close sidebar"],
-button[aria-label="Collapse sidebar"] {
+/* Hide only the collapse arrow button inside the sidebar */
+section[data-testid="stSidebar"] button[aria-label="Close sidebar"],
+section[data-testid="stSidebar"] button[aria-label="Collapse sidebar"] {
   display: none !important;
-  visibility: hidden !important;
-  pointer-events: none !important;
+}
+/* Hide the floating "open sidebar" button (not needed — sidebar never hides) */
+[data-testid="collapsedControl"] {
+  display: none !important;
 }
 
 /* ── Inputs ──────────────────────────────────────────── */
@@ -196,6 +201,52 @@ hr { border-color: var(--border) !important; margin: 0.75rem 0 !important; }
 ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
 </style>
 """, unsafe_allow_html=True)
+
+# ── Keep sidebar permanently open ────────────────────────────
+# Uses window.parent (same-origin localhost) to intercept collapse clicks
+# before they fire and to revert any style-based collapse.
+components.html("""
+<script>
+(function () {
+    if (window.parent._sbGuard) return;
+    window.parent._sbGuard = true;
+    var doc = window.parent.document;
+
+    // 1. Intercept any click on a collapse/close-sidebar button (capture phase)
+    doc.addEventListener('click', function (e) {
+        var btn = e.target.closest('button');
+        if (!btn) return;
+        var label = (btn.getAttribute('aria-label') || '').toLowerCase();
+        if ((label.includes('collapse') || label.includes('close')) && label.includes('sidebar')) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+        }
+    }, true);
+
+    // 2. Watch for the sidebar being hidden via inline style or class changes
+    function restoreSidebar() {
+        var sb = doc.querySelector('[data-testid="stSidebar"]');
+        if (!sb) return;
+        sb.style.setProperty('transform', 'none', 'important');
+        sb.style.setProperty('left', '0px', 'important');
+        sb.style.setProperty('visibility', 'visible', 'important');
+        sb.style.setProperty('min-width', '18rem', 'important');
+    }
+
+    function setup() {
+        var sb = doc.querySelector('[data-testid="stSidebar"]');
+        if (!sb) { setTimeout(setup, 300); return; }
+        restoreSidebar();
+        new MutationObserver(restoreSidebar).observe(sb, {
+            attributes: true,
+            attributeFilter: ['style', 'class', 'aria-expanded']
+        });
+    }
+
+    setTimeout(setup, 400);
+})();
+</script>
+""", height=0, scrolling=False)
 
 # ══════════════════════════════════════════════════════════════
 # STATE & QUEUE
