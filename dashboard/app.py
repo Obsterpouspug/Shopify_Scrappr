@@ -73,16 +73,18 @@ section[data-testid="stSidebar"] label {
   font-size: 0.75rem !important;
   font-weight: 500 !important;
 }
-/* Collapsed sidebar re-open strip — make it visible on dark bg */
+/* Collapsed sidebar re-open strip — high contrast so it's never invisible */
 [data-testid="collapsedControl"] {
-  background: var(--surface) !important;
-  border-right: 1px solid var(--border) !important;
+  background: #1e293b !important;
+  border-right: 2px solid #3b82f6 !important;
+  min-width: 24px !important;
 }
 [data-testid="collapsedControl"] button {
-  color: var(--blue) !important;
+  color: #3b82f6 !important;
+  font-size: 1.1rem !important;
 }
 [data-testid="collapsedControl"] button:hover {
-  background: rgba(59,130,246,0.15) !important;
+  background: rgba(59,130,246,0.2) !important;
   color: #fff !important;
 }
 
