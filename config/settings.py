@@ -94,54 +94,53 @@ Title       : {title}
 Description : {description}
 Price       : {price}
 Tags        : {tags}
+Has GIF     : {has_gif}
+Has Image   : {has_image}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
 ━━━ ABSOLUTE RULES ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 - Output 100% in French. Native, natural French. Zero grammar mistakes.
+- NEVER output any word in English — including the title, variant names, and all field values.
 - NEVER mention competitor names, store names, or trademarks anywhere.
 - NEVER invent specs (dimensions, weight, materials) you cannot confirm from the input.
 - NEVER keyword stuff. One keyword per idea, naturally placed.
 - Output only the final result. No explanations, no preamble.
 - The output product MUST be the EXACT SAME product as "{title}". No substitutions. No hallucinations.
 
-━━━ TITLE RULES ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-- Faithfully translate and adapt the original title to French.
-- Format: [Product name in French] – [one concrete differentiator]
-- Max 150 characters. Lead with the main product keyword.
+━━━ TITLE (CRITICAL) ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- ALWAYS translate the title fully into French. Never leave a single English word.
+- Format: [French product name] – [one concrete differentiator in French]
+- Max 150 characters. Lead with the main French keyword.
 - No brand names. No superlatives ("meilleur", "incroyable", etc.).
-- Good example: "Lampe LED RGB Rechargeable – Contrôle via App et Mode Flamme"
-- Bad example: "Produit Lumineux Fantastique pour Toute la Famille"
+- Good: "Siège de Bain Bébé avec Thermomètre – Sécurisé dès 6 Mois"
+- Bad: "Baby Bath Seat" or "Produit Fantastique pour Toute la Famille"
 
-━━━ SEO TITLE (for meta, max 60 characters) ━━━━━━━━
-- Short, keyword-first, no brand name.
+━━━ SEO TITLE (meta, max 60 characters) ━━━━━━━━━━━━
+- In French. Keyword-first. No brand name.
+- Good: "Siège de Bain Bébé Antidérapant – Thermomètre Intégré"
 
-━━━ SEO DESCRIPTION (for meta, max 160 characters) ━
-- One benefit-led sentence. Natural French. End with a soft CTA.
+━━━ SEO DESCRIPTION (meta, max 160 characters) ━━━━━
+- In French. One benefit-led sentence. End with a soft CTA.
 
-━━━ MEDIA AVAILABLE ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-GIF found in competitor description : {has_gif}
-Image found in competitor description : {has_image}
-- If {has_gif} is true  → include [INSERT_GIF_1]   after the first intro paragraph (priority placement).
-- If {has_image} is true → include [INSERT_IMAGE_1] after the benefits list.
+━━━ MEDIA PLACEHOLDERS ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- If Has GIF is true  → place [INSERT_GIF_1]   after the first intro paragraph.
+- If Has Image is true → place [INSERT_IMAGE_1] after the benefits list.
 - If false → omit that placeholder entirely. Never write a placeholder for missing media.
 
 ━━━ PRODUCT DESCRIPTION STRUCTURE ━━━━━━━━━━━━━━━━━━
-Follow this exact HTML structure. Do not add or remove sections.
+Follow this exact HTML structure. Do not add section comments or extra markup.
 
-<!-- SECTION 1: HEADLINE -->
-<h2>🌱 [Bold, punchy headline — 1 line, benefit-driven, not a slogan. The 🌱 emoji is mandatory and always first. Example: "🌱 Éveillez la curiosité de votre enfant avec des instruments de musique en bois naturel"]</h2>
+<h2>🌱 [Punchy benefit-driven headline — 1 line. The 🌱 emoji is mandatory and always first. Translate and improve the competitor headline if strong, rewrite if generic.]</h2>
 
-<!-- SECTION 2: INTRO -->
-<p>[2–3 sentences. Introduce the product, what it does, who it's for. Factual and warm. No hype.]</p>
+<p>[2–3 sentences in French. Introduce the product, what it does, who it's for. Factual and warm. No hype.]</p>
 
 [INSERT_GIF_1 if applicable]
 
-<p>[1–2 sentences. A second angle: a key feature or use case not covered above.]</p>
+<p>[1–2 sentences. A second angle: highlight a key feature or use case not covered above.]</p>
 
-<!-- SECTION 3: BENEFITS -->
 <h3>✅ Pourquoi vous allez l'adorer</h3>
 <ul>
-  <li>[emoji relevant to this specific benefit] [Benefit 1 — specific, concrete. No period before the emoji. Example: 🎵 Développe l'oreille musicale dès le plus jeune âge]</li>
+  <li>[emoji] [Benefit 1 — specific, concrete. Emoji must relate to the benefit. No 🔹. Example: 🎵 Développe l'oreille musicale dès le plus jeune âge]</li>
   <li>[emoji] [Benefit 2]</li>
   <li>[emoji] [Benefit 3]</li>
   <li>[emoji] [Benefit 4]</li>
@@ -151,26 +150,31 @@ Follow this exact HTML structure. Do not add or remove sections.
 
 [INSERT_IMAGE_1 if applicable]
 
-<!-- SECTION 4: SPECS — include ONLY fields you can confirm from the input, skip the rest -->
 <h3>📦 Caractéristiques</h3>
 <ul>
-  <li><strong>Marque :</strong> Montessori France</li>
-  [Include only the lines below that you have real data for — omit the others entirely]
-  <li><strong>Matériaux :</strong> [confirmed material only]</li>
-  <li><strong>Tranche d'âge :</strong> [confirmed age range only]</li>
-  <li><strong>Dimensions :</strong> [confirmed dimensions only]</li>
-  <li><strong>Contenu du colis :</strong> [confirmed box contents only]</li>
+  <li><strong>Type :</strong> [product type in French]</li>
+  [Include ONLY lines where you have confirmed data from the input — omit all others]
+  <li><strong>Matériau :</strong> [exact materials from input, translated to French]</li>
+  <li><strong>Dimensions :</strong> [exact dimensions from input]</li>
+  <li><strong>Poids :</strong> [weight if mentioned]</li>
+  <li><strong>Couleur :</strong> [color if mentioned, in French]</li>
+  <li><strong>Contenu de la boîte :</strong> [box contents if mentioned, in French]</li>
+  <li><strong>Âge recommandé :</strong> [age range if mentioned, in French]</li>
 </ul>
 
-<!-- SECTION 5: CTA -->
-<p>🎁 [1–2 sentences. Restate the product name, summarize its core value. Warm, natural CTA — not pushy.]</p>
+<p>🎁 [1–2 sentences. Restate the product name naturally, summarize its core value. Warm CTA — not pushy.]</p>
 
 ━━━ EMOJI RULES ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-- 🌱 is mandatory on the h2 headline. Always.
+- 🌱 is mandatory on the h2 headline. Always first.
 - Each benefit <li> must start with a unique emoji relevant to that specific benefit. No 🔹.
-- No period or dot before any emoji.
-- Max 1 emoji per line. No emojis mid-sentence.
-- Allowed in CTA: 🎁 plus one thematic emoji at the end.
+- No emojis mid-sentence. Max 1 emoji per line.
+- Section headings use: ✅ (benefits), 📦 (specs), 🎁 (CTA).
+
+━━━ SPECS RULES ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+- Extract ALL specs present in the competitor description.
+- Translate to French but keep values exact — do not round or paraphrase numbers.
+- Omit any spec line not found in the input. Never invent.
+- Do NOT add "Marque : Montessori France" to the specs list.
 
 ━━━ OUTPUT FORMAT ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Return valid JSON only. No markdown fences. No text outside the JSON.
